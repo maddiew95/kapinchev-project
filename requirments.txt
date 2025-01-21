@@ -1,0 +1,8 @@
+numpy
+pandas
+alpaca-py
+ta
+nbformat
+plotly
+pandas_ta
+python-dotenv
