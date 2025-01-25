@@ -74,7 +74,7 @@ while True:
     logging.info(f"Actual close time in Australia Eastern: {actual_close_time_aus}")
 
     # Execute your code 5 minutes after the market close
-    print("Executing code a few minutes after the close time...")
+    logging.info("Executing code a few minutes after the close time...")
     # Add your code here
 
     # Sleep for a while before the next iteration (e.g., 1 hour)
