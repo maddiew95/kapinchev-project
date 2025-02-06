@@ -1,4 +1,4 @@
-import os, pandas as pd, time, logging, numpy as np
+import os, pandas as pd, time, logging, numpy as np, requests as req, bs4 as soup
 from ta.volatility import AverageTrueRange
 from ta.momentum import StochasticOscillator, rsi
 from dateutil import tz
@@ -15,8 +15,8 @@ from alpaca.trading.enums import OrderSide, TimeInForce
 
 load_dotenv()
 
-key = os.getenv('API_KEY')
-secret = os.getenv('API_SECRET')
+key = os.getenv('API_KEY_PAPER')
+secret = os.getenv('API_SECRET_PAPER')
 ny_eastern = tz.gettz('US/Eastern')
 stock_client = StockHistoricalDataClient(key, secret)
 
@@ -25,9 +25,19 @@ account_client = TradingClient(key, secret)
 # To get the current buying power of the account
 def buy_power():
     account = account_client.get_account()
-    return account.buying_power
+    return float(account.buying_power)
 
-# To get historical data up till whenever "today" is from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
+def new_data(symbol):
+    class1 = "text-4xl font-bold block sm:inline"
+    class2 = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
+    url = f"https://stockanalysis.com/stocks/{symbol}/"
+    close = soup.BeautifulSoup(req.get(url).text, 'html.parser').find('div', class_=class1).text
+    low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[12].text.split(' - '))
+    # TODO: add the data into local database
+    dict = {"close": close, "low": low, "high": high}
+    return f"{high}, {low}, {close}"
+
+# To get historical data from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
 def stock_data(symbol, today, years_ago):
     params = StockBarsRequest(
         symbol_or_symbols=symbol,
@@ -37,12 +47,7 @@ def stock_data(symbol, today, years_ago):
         )
     bars =  stock_client.get_stock_bars(params)
     raw = pd.DataFrame(bars.model_dump()["data"][symbol]).drop(columns=["symbol"])
-    raw["smaLow"] = raw.close.rolling(window=7).mean()
-    raw["smaHigh"] = raw.close.rolling(window=21).mean()
-    raw["so"] = StochasticOscillator(raw.high, raw.low, raw.close, window=14).stoch()
-    raw["atr"] = AverageTrueRange(raw.high, raw.low, raw.close, window=14).average_true_range()
-    raw["rsi"] = rsi(raw.close, window=14)
-    return raw
+    raw.to_csv(f"{symbol}.csv", index=False)
 
 # To get the closing price of the stock for the next trading day
 def next_close():
@@ -60,3 +65,8 @@ def submit_order(symbol, qty, order_type):
     account_client.submit_order(order_data=order_data)
 
 
+# df.close.rolling(window=7).mean()
+# df.close.rolling(window=21).mean()
+# StochasticOscillator(df.high, df.low, df.close, window=14).stoch()
+# AverageTrueRange(df.high, df.low, df.close, window=14).average_true_range()
+# rsi(df.close, window=14)
