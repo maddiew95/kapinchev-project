@@ -34,13 +34,12 @@ def equity():
     return float(account.equity)
 
 def new_data(symbol):
-    class1 = "text-4xl font-bold block sm:inline"
+    class1 = "text-4xl font-bold transition-colors duration-300 block sm:inline"
     class2 = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
     url = f"https://stockanalysis.com/stocks/{symbol}/"
     close = soup.BeautifulSoup(req.get(url).text, 'html.parser').find('div', class_=class1).text
     low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[12].text.split(' - '))
     # TODO: add the data into local database
-    dict = {"close": close, "low": low, "high": high}
     return f"{high}, {low}, {close}"
 
 # To get historical data from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
