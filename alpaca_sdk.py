@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime as dt, timedelta
 from dotenv import load_dotenv
 from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import GetAssetsRequest
 from alpaca.data import StockHistoricalDataClient
 from alpaca.data import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
@@ -15,17 +16,22 @@ from alpaca.trading.enums import OrderSide, TimeInForce
 
 load_dotenv()
 
-key = os.getenv('API_KEY_PAPER')
-secret = os.getenv('API_SECRET_PAPER')
+key = os.getenv('API_KEY')
+secret = os.getenv('API_SECRET')
 ny_eastern = tz.gettz('US/Eastern')
 stock_client = StockHistoricalDataClient(key, secret)
 
-account_client = TradingClient(key, secret)
+# Set paper to True if you want to use the paper trading account
+account_client = TradingClient(key, secret, paper=False)
 
 # To get the current buying power of the account
 def buy_power():
     account = account_client.get_account()
     return float(account.buying_power)
+
+def equity():
+    account = account_client.get_account()
+    return float(account.equity)
 
 def new_data(symbol):
     class1 = "text-4xl font-bold block sm:inline"
