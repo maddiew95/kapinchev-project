@@ -22,14 +22,12 @@ while True:
     time_diff = (next_close_aus - current_time_aus).total_seconds()
 
     # check every 15 minutes if time_diff is greater than 15 minutes, if not, ready to trade
-    if time_diff > 60 * 15 :
-        logging.info(f"Time difference between next close and current time: {time_diff} seconds")
-        logging.info("Not yet time to trade")
+    if(time_diff > 60 * 15 and time_diff > 60 * 60):
         time.sleep(60 * 15)
         
     else: 
-        time.sleep(time_diff + 60 * 3)
-
+        time.sleep(time_diff + 60 * 2.5)
+        logging.info("Market is closing, preparing to start the algorithm")
         # Log the actual close time
         actual_close_time_nyc = dt.now(tz=us_eastern)
         actual_close_time_aus = actual_close_time_nyc.astimezone(australia_eastern)
@@ -45,7 +43,7 @@ while True:
 
         # Write the data to a CSV file
         with open("bngo.csv", "a") as f:
-            f.write(f"{dt.now(tz=ny_eastern)}, ,{new_data('bngo')}, , \n")
+            f.write(f"{dt.now(tz=ny_eastern)}, {new_data('BNGO')}, , \n")
 
 
         # df1 = pd.read_csv("BNGO.csv")

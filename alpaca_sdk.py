@@ -37,10 +37,12 @@ def new_data(symbol):
     class1 = "text-4xl font-bold transition-colors duration-300 block sm:inline"
     class2 = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
     url = f"https://stockanalysis.com/stocks/{symbol}/"
+    open = soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[10].text
     close = soup.BeautifulSoup(req.get(url).text, 'html.parser').find('div', class_=class1).text
     low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[12].text.split(' - '))
+    # print(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2))
     # TODO: add the data into local database
-    return f"{high}, {low}, {close}"
+    return f"{open}, {high}, {low}, {close}"
 
 # To get historical data from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
 def stock_data(symbol, today, years_ago):

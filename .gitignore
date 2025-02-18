@@ -2,3 +2,5 @@
 .venv
 *.csv
 *.ipynb
+*.txt
+!requirements.txt
