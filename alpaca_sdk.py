@@ -1,4 +1,4 @@
-import os, pandas as pd, time, logging, numpy as np, requests as req, bs4 as soup
+import os, pandas as pd, time, logging, numpy as np, requests as req, bs4 as soup, re
 from ta.volatility import AverageTrueRange
 from ta.momentum import StochasticOscillator, rsi
 from dateutil import tz
@@ -34,15 +34,13 @@ def equity():
     return float(account.equity)
 
 def new_data(symbol):
-    class1 = "text-4xl font-bold transition-colors duration-300 block sm:inline"
-    class2 = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
+    c = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
     url = f"https://stockanalysis.com/stocks/{symbol}/"
-    open = soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[10].text
-    close = soup.BeautifulSoup(req.get(url).text, 'html.parser').find('div', class_=class1).text
-    low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2)[12].text.split(' - '))
+    close = re.findall("\d+\.\d{2}", soup.BeautifulSoup(req.get(url).text, 'html.parser').find_all('div')[0].text)[0]
+    low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=c)[12].text.split(' - '))
     # print(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2))
     # TODO: add the data into local database
-    return f"{open}, {high}, {low}, {close}"
+    return f" , {high}, {low}, {close}"
 
 # To get historical data from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
 def stock_data(symbol, today, years_ago):
@@ -71,7 +69,11 @@ def submit_order(symbol, qty, order_type):
     # Market order
     account_client.submit_order(order_data=order_data)
 
+def write_data(symbol):
+    with open(f"{symbol}.csv", "a") as f:
+        f.write(f"{dt.now(tz=ny_eastern)}, {new_data(symbol)}, , \n")
 
+        
 # df.close.rolling(window=7).mean()
 # df.close.rolling(window=21).mean()
 # StochasticOscillator(df.high, df.low, df.close, window=14).stoch()

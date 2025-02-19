@@ -6,7 +6,8 @@ logging
 us_eastern = tz.gettz('US/Eastern')
 australia_eastern = tz.gettz('Australia/Sydney')
 buy_signal = False
-stock_data("BNGO", dt.now().date(), 10)
+symbol = "BNGO"
+stock_data(symbol, dt.now().date(), 10)
 
 # Set up logging
 logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -21,7 +22,7 @@ while True:
     # Calculate the time difference between the next close time and the current time
     time_diff = (next_close_aus - current_time_aus).total_seconds()
 
-    # check every 15 minutes if time_diff is greater than 15 minutes, if not, ready to trade
+    # check every 15 minutes if time_diff is greater than 15 minutes and 60 minutes of trading time, if not, ready to trade
     if(time_diff > 60 * 15 and time_diff > 60 * 60):
         time.sleep(60 * 15)
         
@@ -38,33 +39,13 @@ while True:
         logging.info("Algorithm execution started")
 
         # TODO: will use the list, and money to split each investment money into equal parts
-        symbols = []
-        money = buy_power() // len(symbols)
+        # symbols = []
+        # money = buy_power() // len(symbols)
 
         # Write the data to a CSV file
-        with open("bngo.csv", "a") as f:
-            f.write(f"{dt.now(tz=ny_eastern)}, {new_data('BNGO')}, , \n")
+        write_data(symbol)
 
 
-        # df1 = pd.read_csv("BNGO.csv")
-
-        # smaLow1 = df1.close.rolling(window=7).mean()
-        # smaHigh1 = df1.close.rolling(window=21).mean()
-        # so1 = StochasticOscillator(df1.high, df1.low, df1.close, window=14).stoch()
-        # AverageTrueRange(df.high, df.low, df.close, window=14).average_true_range()
-        # rsi1 = rsi(df1.close, window=14)
-        # logic_buy_1 = smaLow1[-1] > smaHigh1[-1] and rsi1[-1] < 40 and so1 < 30
-        # logic_sell_1 = smaLow1[-1] < smaHigh1[-1] and rsi1[-1] > 60  and so1[-1] > 70
-        # qty = buy_power() // float(df['close'].iloc[-1])
-
-        # if logic_buy_1 and not buy_signal:
-        #     buy_signal = True
-        #     submit_order(symbol, qty, OrderSide.BUY)
-        #     logging.info(f"Buying {qty} shares of {symbol}")
-        # elif logic_sell_1 and buy_signal:
-        #     buy_signal = False
-        #     submit_order(symbol, qty, OrderSide.SELL)
-        #     logging.info(f"Selling {qty} shares of {symbol}")
 
         logging.info("Code execution completed")
 
