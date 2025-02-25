@@ -29,17 +29,11 @@ def buy_power():
     account = account_client.get_account()
     return float(account.buying_power)
 
-def equity():
-    account = account_client.get_account()
-    return float(account.equity)
-
 def new_data(symbol):
     c = "whitespace-nowrap px-0.5 py-[1px] text-left text-smaller font-semibold tiny:text-base xs:px-1 sm:py-2 sm:text-right sm:text-small"
     url = f"https://stockanalysis.com/stocks/{symbol}/"
     close = re.findall("\d+\.\d{2}", soup.BeautifulSoup(req.get(url).text, 'html.parser').find_all('div')[0].text)[0]
     low, high = tuple(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=c)[12].text.split(' - '))
-    # print(soup.BeautifulSoup(req.get(url).text, 'html.parser').findAll('td', class_=class2))
-    # TODO: add the data into local database
     return f" , {high}, {low}, {close}"
 
 # To get historical data from a certain number of years ago (e.g. 5 years ago) NOTE: Alpaca only allows 8 years of data
@@ -52,6 +46,7 @@ def stock_data(symbol, today, years_ago):
         )
     bars =  stock_client.get_stock_bars(params)
     raw = pd.DataFrame(bars.model_dump()["data"][symbol]).drop(columns=["symbol"])
+    raw["buy_signal"] = False
     raw.to_csv(f"{symbol}.csv", index=False)
 
 # To get the closing price of the stock for the next trading day
@@ -71,11 +66,5 @@ def submit_order(symbol, qty, order_type):
 
 def write_data(symbol):
     with open(f"{symbol}.csv", "a") as f:
-        f.write(f"{dt.now(tz=ny_eastern)}, {new_data(symbol)}, , \n")
+        f.write(f"{dt.now(tz=ny_eastern)}, {new_data(symbol)}, , , \n")
 
-        
-# df.close.rolling(window=7).mean()
-# df.close.rolling(window=21).mean()
-# StochasticOscillator(df.high, df.low, df.close, window=14).stoch()
-# AverageTrueRange(df.high, df.low, df.close, window=14).average_true_range()
-# rsi(df.close, window=14)

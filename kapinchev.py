@@ -1,4 +1,5 @@
 from alpaca_sdk import *
+from algo import *
 
 logging
 
@@ -7,6 +8,13 @@ us_eastern = tz.gettz('US/Eastern')
 australia_eastern = tz.gettz('Australia/Sydney')
 buy_signal = False
 symbol = "BNGO"
+
+# selecte symbols
+# symbols = ["URG", "PLBY", "CNF", "UP"]
+
+# initiate the stocks' data
+#for i in symbols: stock_data(i, dt.now().date(), 10)
+
 stock_data(symbol, dt.now().date(), 10)
 
 # Set up logging
@@ -27,8 +35,8 @@ while True:
         time.sleep(60 * 15)
         
     else: 
+        logging.info("Trading time approaching within 1 hour")
         time.sleep(time_diff + 60 * 2.5)
-        logging.info("Market is closing, preparing to start the algorithm")
         # Log the actual close time
         actual_close_time_nyc = dt.now(tz=us_eastern)
         actual_close_time_aus = actual_close_time_nyc.astimezone(australia_eastern)
@@ -38,9 +46,17 @@ while True:
         # Algorithm starts here
         logging.info("Algorithm execution started")
 
-        # TODO: will use the list, and money to split each investment money into equal parts
-        # symbols = []
-        # money = buy_power() // len(symbols)
+        # money = round(float(buy_power() / len(symbols)), 2)
+
+        # run algo
+        # for i in symbols:
+              # get the buy signal
+        #     buy_signal = bool(pd.read_csv("PLBY.csv")["buy_signal"].iloc[-1])
+              # write the new data to the CSV file, without buy_signal
+        #     write_data(i)
+              
+        #     algo(i, buy_signal, money)
+        #     time.sleep(3)
 
         # Write the data to a CSV file
         write_data(symbol)
@@ -48,6 +64,5 @@ while True:
 
 
         logging.info("Code execution completed")
-
-        # Sleep for a while before the next iteration (e.g., 1 hour)
-        break
+        pass
+    
