@@ -6,16 +6,9 @@ logging
 # Define timezones
 us_eastern = tz.gettz('US/Eastern')
 australia_eastern = tz.gettz('Australia/Sydney')
-buy_signal = False
 symbol = "BNGO"
 
-# selecte symbols
-# symbols = ["URG", "PLBY", "CNF", "UP"]
-
-# initiate the stocks' data
-#for i in symbols: stock_data(i, dt.now().date(), 10)
-
-stock_data(symbol, dt.now().date(), 10)
+stock_data(symbol, dt.now(tz=us_eastern).date(), 10)
 
 # Set up logging
 logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -37,6 +30,7 @@ while True:
     else: 
         logging.info("Trading time approaching within 1 hour")
         time.sleep(time_diff + 60 * 2.5)
+        
         # Log the actual close time
         actual_close_time_nyc = dt.now(tz=us_eastern)
         actual_close_time_aus = actual_close_time_nyc.astimezone(australia_eastern)
@@ -46,17 +40,10 @@ while True:
         # Algorithm starts here
         logging.info("Algorithm execution started")
 
-        # money = round(float(buy_power() / len(symbols)), 2)
-
+        money = round(float(buy_power() / 4), 2)
+        buy_signal = bool(pd.read_csv(f"{symbol}.csv")['buy_signal'].iloc[-1])
         # run algo
-        # for i in symbols:
-              # get the buy signal
-        #     buy_signal = bool(pd.read_csv("PLBY.csv")["buy_signal"].iloc[-1])
-              # write the new data to the CSV file, without buy_signal
-        #     write_data(i)
-              
-        #     algo(i, buy_signal, money)
-        #     time.sleep(3)
+        algo(symbol, buy_signal, money)
 
         # Write the data to a CSV file
         write_data(symbol)
@@ -64,5 +51,5 @@ while True:
 
 
         logging.info("Code execution completed")
-        pass
+        
     
