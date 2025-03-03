@@ -45,8 +45,7 @@ while True:
         # run algo
         algo(symbol, buy_signal, money)
 
-        # Write the data to a CSV file
-        write_data(symbol)
+       
 
 
 

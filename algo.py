@@ -1,14 +1,17 @@
 from alpaca_sdk import *
 
 def algo(symbol, buy_signal, money):
+    # Write the data to a CSV file
+    write_data(symbol)
+
     df = pd.read_csv(f"{symbol}.csv")
     smaLow = df.close.rolling(window=7).mean()
     smaHigh = df.close.rolling(window=21).mean()
     so = StochasticOscillator(df.high, df.low, df.close, window=14).stoch()
     # AverageTrueRange(df.high, df.low, df.close, window=14).average_true_range()
     rsi_value = rsi(df.close, window=14)
-    logic_buy = smaLow[-1] > smaHigh[-1] and rsi_value[-1] < 40 and so < 30
-    logic_sell = smaLow[-1] < smaHigh[-1] and rsi_value[-1] > 60  and so[-1] > 70
+    logic_buy = bool(smaLow.iloc[-1] > smaHigh.iloc[-1] and rsi_value.iloc[-1] < 40 and so.iloc < 30)
+    logic_sell = bool(smaLow.iloc[-1] < smaHigh.iloc[-1] and rsi_value.iloc[-1] > 60  and so.iloc[-1] > 70)
     qty = int(money / float(df['close'].iloc[-1]))
 
     if logic_buy and not buy_signal:
