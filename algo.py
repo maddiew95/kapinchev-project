@@ -1,4 +1,6 @@
 from alpaca_sdk import *
+from discord import SyncWebhook
+hook = SyncWebhook.from_url("https://discord.com/api/webhooks/1348574950608474182/vCGEs34zVIiaFtNWz3GDMl2d8-iiYTZjRZhyAIQGP1Y1xwkbQpZ3pGJQC8yPS8zGftfm")
 
 def algo(symbol, buy_signal, money):
     # Write the data to a CSV file
@@ -13,14 +15,17 @@ def algo(symbol, buy_signal, money):
     logic_buy = bool(smaLow.iloc[-1] > smaHigh.iloc[-1] and rsi_value.iloc[-1] < 40 and so.iloc < 30)
     logic_sell = bool(smaLow.iloc[-1] < smaHigh.iloc[-1] and rsi_value.iloc[-1] > 60  and so.iloc[-1] > 70)
     qty = int(money / float(df['close'].iloc[-1]))
+    hook.send(f"logic_buy: {logic_buy}, logic_sell: {logic_sell}, buy_signal: {buy_signal}, qty: {qty}")
 
     if logic_buy and not buy_signal:
         buy_signal = True
         submit_order(symbol, qty, OrderSide.BUY)
+        hook.send(f"Buying {qty} shares of {symbol}")
         logging.info(f"Buying {qty} shares of {symbol}")
     elif logic_sell and buy_signal:
         buy_signal = False
         submit_order(symbol, qty, OrderSide.SELL)
+        hook.send(f"Selling {qty} shares of {symbol}")
         logging.info(f"Selling {qty} shares of {symbol}")
     
     # write the new buy_signal to the CSV file
