@@ -1,6 +1,7 @@
 from alpaca_sdk import *
 from discord import SyncWebhook
-hook = SyncWebhook.from_url("https://discord.com/api/webhooks/1348574950608474182/vCGEs34zVIiaFtNWz3GDMl2d8-iiYTZjRZhyAIQGP1Y1xwkbQpZ3pGJQC8yPS8zGftfm")
+load_dotenv()
+hook = SyncWebhook.from_url(os.getenv('HOOK'))
 
 def algo(symbol, buy_signal, money):
     # Write the data to a CSV file
