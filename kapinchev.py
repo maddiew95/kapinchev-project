@@ -15,7 +15,8 @@ logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format=
 
 while True:
     # Convert next_close to local time (Australia)
-    next_close_aus = next_close().astimezone(australia_eastern)
+    next_close_nyc = next_close()
+    next_close_aus = next_close_nyc.astimezone(australia_eastern)
 
     # Get the current time in Australia
     current_time_aus = dt.now(tz=australia_eastern)

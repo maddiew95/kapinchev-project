@@ -13,11 +13,11 @@ def algo(symbol, buy_signal, money):
     so = StochasticOscillator(df.high, df.low, df.close, window=14).stoch()
     # AverageTrueRange(df.high, df.low, df.close, window=14).average_true_range()
     rsi_value = rsi(df.close, window=14)
+    hook.send(f"smaLow: {smaLow.iloc[-1]}, smaHigh: {smaHigh.iloc[-1]}, so: {so.iloc[-1]}, rsi: {rsi_value.iloc[-1]}")
     logic_buy = bool(smaLow.iloc[-1] > smaHigh.iloc[-1] and rsi_value.iloc[-1] < 40 and so.iloc[-1] < 30)
     logic_sell = bool(smaLow.iloc[-1] < smaHigh.iloc[-1] and rsi_value.iloc[-1] > 60  and so.iloc[-1] > 70)
     qty = int(money / float(df['close'].iloc[-1]))
     hook.send(f"logic_buy: {logic_buy}, logic_sell: {logic_sell}, buy_signal: {buy_signal}, qty: {qty}")
-
     if logic_buy and not buy_signal:
         buy_signal = True
         submit_order(symbol, qty, OrderSide.BUY)
