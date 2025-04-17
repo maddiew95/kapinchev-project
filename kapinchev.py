@@ -10,8 +10,8 @@ symbol = "BNGO"
 
 stock_data(symbol, dt.now(tz=us_eastern).date(), 10)
 
-# Set up logging
-logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
+# # Set up logging
+# logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 while True:
     # Convert next_close to local time (Australia)
