@@ -1,7 +1,7 @@
 import os, pandas as pd, time, logging, numpy as np, requests as req, bs4 as soup, re
 from ta.volatility import AverageTrueRange
 from ta.momentum import StochasticOscillator, rsi
-from dateutil import tz
+from dateutil import tz, parser
 from dateutil.relativedelta import relativedelta
 from datetime import datetime as dt, timedelta
 from dotenv import load_dotenv
@@ -20,6 +20,7 @@ key = os.getenv('API_KEY_PAPER')
 secret = os.getenv('API_SECRET_PAPER')
 ny_eastern = tz.gettz('US/Eastern')
 stock_client = StockHistoricalDataClient(key, secret)
+nasdaq_api = "https://api.nasdaq.com/api"
 
 # Set paper to True if you want to use the paper trading account
 account_client = TradingClient(key, secret, paper=True)
@@ -64,7 +65,10 @@ def stock_data(symbol, today, years_ago):
 # To get the closing price of the stock for the next trading day
 def next_close():
     try:
-        return account_client.get_clock().next_close
+        # Using Steve's NASDAQ API since Alpaca is giving errors.
+        r = req.get("https://api.nasdaq.com/api/market-info", headers={'User-Agent': '-'})
+        date_string = r.json()["data"]["marketClosingTime"].replace(' ET', ' -0400')
+        return parser.parse(date_string)
     except Exception as e:
         print("next_close exception: " ,e)
         time.sleep(15)
