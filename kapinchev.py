@@ -14,23 +14,21 @@ stock_data(symbol, dt.now(tz=us_eastern).date(), 10)
 # logging.basicConfig(filename='market_close_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 while True:
-    # Convert next_close to local time (Australia)
-    next_close_nyc = next_close()
-    next_close_aus = next_close_nyc.astimezone(australia_eastern)
 
-    # Get the current time in Australia
-    current_time_aus = dt.now(tz=australia_eastern)
+    if is_market_open(): # If market is open (True)
 
-    # Calculate the time difference between the next close time and the current time
-    time_diff = (next_close_aus - current_time_aus).total_seconds()
+        # Convert next_close to local time (Australia)
+        next_close_nyc = next_close()
+        next_close_aus = next_close_nyc.astimezone(australia_eastern)
 
-    # check every 15 minutes if time_diff is greater than 15 minutes and 60 minutes of trading time, if not, ready to trade
-    if(time_diff > 60 * 15 and time_diff > 60 * 60):
-        time.sleep(60 * 15)
+        # Get the current time in Australia
+        current_time_aus = dt.now(tz=australia_eastern)
+
+        # Calculate the time difference between the next close time and the current time
+        time_diff = (next_close_aus - current_time_aus).total_seconds()
         
-    else: 
-        logging.info("Trading time approaching within 1 hour")
-        time.sleep(time_diff + 60 * 2.5)
+        # logging.info("Trading time approaching within 1 hour")
+        time.sleep(time_diff - 30) # Sleep till right 30 sec before closing time to buy/sell
         
         # Log the actual close time
         actual_close_time_nyc = dt.now(tz=us_eastern)
@@ -46,10 +44,5 @@ while True:
         # run algo
         algo(symbol, buy_signal, money)
 
-       
-
-
-
-        logging.info("Code execution completed")
-        
-    
+    else: 
+        time.sleep(60 * 60)   # Sleep for 1 hour if market is closed

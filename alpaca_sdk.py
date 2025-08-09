@@ -20,7 +20,6 @@ key = os.getenv('API_KEY_PAPER')
 secret = os.getenv('API_SECRET_PAPER')
 ny_eastern = tz.gettz('US/Eastern')
 stock_client = StockHistoricalDataClient(key, secret)
-nasdaq_api = "https://api.nasdaq.com/api"
 
 # Set paper to True if you want to use the paper trading account
 account_client = TradingClient(key, secret, paper=True)
@@ -62,17 +61,22 @@ def stock_data(symbol, today, years_ago):
         print("stock_data exception: ",e)
         time.sleep(15)
 
+# Check if the market is open
+def is_market_open():
+    try:
+        clock = account_client.get_clock()
+        return clock.is_open
+    except Exception as e:
+        print("is_market_open exception: ", e)
+        time.sleep(15)
+
 # To get the closing price of the stock for the next trading day
 def next_close():
     try:
-        # Using Steve's NASDAQ API since Alpaca is giving errors.
-        r = req.get("https://api.nasdaq.com/api/market-info", headers={'User-Agent': '-'})
-        date_string = r.json()["data"]["marketClosingTime"].replace(' ET', ' -0400')
-        return parser.parse(date_string)
+        return account_client.get_clock().next_close
     except Exception as e:
         print("next_close exception: " ,e)
         time.sleep(15)
-
 
 # Use this function to submit an order (buy and sell)
 def submit_order(symbol, qty, order_type):

@@ -9,3 +9,4 @@ python-dotenv
 requests
 beautifulsoup4
 discord.py
+urllib3==1.26.20
