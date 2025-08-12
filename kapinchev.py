@@ -44,5 +44,7 @@ while True:
         # run algo
         algo(symbol, buy_signal, money)
 
-    else: 
-        time.sleep(60 * 60)   # Sleep for 1 hour if market is closed
+        time.sleep(60 * 60)  # Sleep for 1 hour after trading
+
+    else:
+        time.sleep(60 * 60)  # Sleep for 1 hour if market is closed
